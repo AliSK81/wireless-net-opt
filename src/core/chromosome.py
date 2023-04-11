@@ -1,32 +1,27 @@
 class Chromosome:
-    def __init__(self, genes: list = None):
+    def __init__(self):
         """
-        Initialize chromosome with given genes.
+        Initialize an empty chromosome with allocations, locations, and band widths for each tower.
 
-        Args:
-        - genes (list, optional): A list representing the genes of the chromosome.
-                                  The order of genes in the list represents the allocation of towers to cities,
-                                  where the index of the list corresponds to the city number,
-                                  and the value at that index corresponds to the tower number assigned to that city.
-                                  Default is None, in which case an empty list will be used.
+        Attributes:
+        - allocations (list): A list representing the allocation of towers to the cities.
+                              The index of the list corresponds to the city number,
+                              and the value at that index corresponds to the tower number assigned to that city.
+        - locations (list): A list representing the locations of each tower.
+        - band_widths (list): A list representing the bandwidths of each tower.
         """
-        self.genes = genes or []
-
-    def get_genes(self) -> list:
-        """
-        Return the genes of the chromosome.
-
-        Returns:
-        - list: A list representing the genes of the chromosome.
-        """
-        return self.genes
+        self.allocations = []
+        self.locations = []
+        self.band_widths = []
 
     def generate_random_genes(self) -> None:
         """
-        Generate random genes for the chromosome.
+        Generate random allocations, locations, and band widths for the chromosome.
 
         Modifies:
-        - self.genes: The list representing the genes of the chromosome.
+        - self.allocations: The list representing the allocations of the chromosome.
+        - self.locations: The list representing the locations of the chromosome.
+        - self.band_widths: The list representing the band widths of the chromosome.
         """
         pass
 
@@ -45,13 +40,15 @@ class Chromosome:
 
     def mutate(self, mutation_rate: float) -> None:
         """
-        Mutate the genes of the chromosome.
+        Mutate the allocations, locations, and band widths of the chromosome.
 
         Args:
         - mutation_rate (float): The probability of mutation for each gene.
 
         Modifies:
-        - self.genes: The list representing the genes of the chromosome.
+        - self.allocations: The list representing the allocations of the chromosome.
+        - self.locations: The list representing the locations of the chromosome.
+        - self.band_widths: The list representing the band widths of the chromosome.
         """
         pass
 
