@@ -1,12 +1,12 @@
 class Population:
-    def __init__(self, size: int):
+    def __init__(self, chromosomes=None):
         """
-        Initialize a population with a given size.
+        Initialize a population with a given list of chromosomes.
 
         Args:
-        - size (int): Size of the population.
+        - chromosomes (list): List of chromosomes representing the initial population.
         """
-        pass
+        self.chromosomes = chromosomes or []
 
     def initialize(self):
         """
@@ -38,17 +38,19 @@ class Population:
         """
         pass
 
-    def mutate(self, chromosomes: list) -> list:
+    def mutate(self, mutate_rate: float) -> None:
         """
-        Apply the mutation operator to introduce small changes in offspring chromosomes.
+        Apply the mutation operator to introduce small changes in the chromosomes.
 
         Args:
-        - chromosomes (list): List of chromosomes to be used for mutation.
+        - mutate_rate (float): The mutation rate, which determines the probability of each gene in a chromosome
+                              being mutated.
 
         Returns:
-        - mutated_chromosomes (list): List of offspring chromosomes generated from mutation.
+        - None: This method mutates the chromosomes in-place and does not return any value.
         """
-        pass
+        for chromosome in self.chromosomes:
+            chromosome.mutate(mutate_rate)
 
     def evaluate_fitness(self, chromosomes: list):
         """
