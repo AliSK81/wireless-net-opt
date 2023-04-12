@@ -1,3 +1,6 @@
+from random import randint
+
+
 class Helper:
     def __init__(self):
         """
@@ -50,3 +53,29 @@ class Helper:
             generation_fitness_list (list): List of average fitness values for each generation.
         """
         pass
+
+    @staticmethod
+    def sort_two_points(two_points):
+        """
+        Sort the two points in ascending order.
+
+        Args:
+        - two_points (tuple): A tuple of two integers representing the two points.
+
+        Returns:
+        - tuple: A tuple of two integers representing the sorted points in ascending order.
+        """
+        return tuple(sorted(two_points))
+
+    @staticmethod
+    def create_two_rand_index(array):
+        """
+        Generate two random indices in the range [0, len(array)).
+
+        Args:
+        - array (list): A list for which two random indices need to be generated.
+
+        Returns:
+        - tuple: A tuple of two integers representing two random indices in the range [0, len(array)).
+        """
+        return randint(0, len(array)), randint(0, len(array))
