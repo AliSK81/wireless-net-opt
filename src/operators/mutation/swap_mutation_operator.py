@@ -2,16 +2,30 @@ import random
 
 
 class SwapMutationOperator:
+    """
+    A mutation operator that performs swap mutation on a list of genes.
+    """
 
     @staticmethod
-    def mutate(genes, mutate_rate):
-        mutated_genes = genes[:]
+    def mutate(genes, mutation_rate):
+        """
+        Performs swap mutation on a list of genes.
 
-        if random.random() > mutate_rate:
-            return mutated_genes
+        Args:
+            genes (list): List of genes to be mutated.
+            mutation_rate (float): Probability of mutation for each gene.
 
-        i = random.randint(0, len(mutated_genes) - 1)
-        j = random.randint(0, len(mutated_genes) - 1)
-        mutated_genes[i], mutated_genes[j] = mutated_genes[j], mutated_genes[i]
+        Modifies:
+            genes (list): Genes in the input list are modified by performing swap mutation.
+
+        Returns:
+            list: List of mutated genes after applying swap mutation.
+        """
+        if random.random() > mutation_rate:
+            return genes
+
+        i = random.randint(0, len(genes) - 1)
+        j = random.randint(0, len(genes) - 1)
+        genes[i], genes[j] = genes[j], genes[i]
 
         return genes
