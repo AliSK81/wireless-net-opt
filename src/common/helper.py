@@ -1,3 +1,4 @@
+import json
 from random import randint
 
 
@@ -8,42 +9,35 @@ class Helper:
         """
         pass
 
-    def read_blocks_population(self, file: str) -> list:
+    @staticmethod
+    def read_blocks_population(path: str) -> list:
         """
         Reads the blocks population data from file and returns as a matrix.
 
         Args:
-            file (str): File containing the blocks population data.
+            path (str): File containing the blocks population data.
 
         Returns:
             list: Matrix representing the blocks population data.
         """
-        pass
+        with open(path, 'r') as file:
+            matrix = [list(map(int, line.strip().split(','))) for line in file]
+        return matrix
 
-    def read_problem_config(self, file: str) -> dict:
+    @staticmethod
+    def read_problem_config(path: str) -> dict:
         """
         Reads the problem configuration data from file and returns as a dictionary.
 
         Args:
-            file (str): File containing the problem configuration data.
+            path (str): File containing the problem configuration data.
 
         Returns:
             dict: Dictionary containing the problem configuration data.
         """
-        pass
-
-    def calculate_user_satisfaction(self, received_bandwidth: float, required_bandwidth: float) -> float:
-        """
-        Calculates user satisfaction based on received bandwidth and required bandwidth.
-
-        Args:
-            received_bandwidth (float): Received bandwidth in Mb/s.
-            required_bandwidth (float): Required bandwidth in Mb/s.
-
-        Returns:
-            float: User satisfaction level.
-        """
-        pass
+        with open(path, 'r') as file:
+            config = json.load(file)
+        return config
 
     def plot_fitness_graph(self, generation_fitness_list: list):
         """
