@@ -1,3 +1,9 @@
+import random
+from random import randint
+
+from core.chromosome import Chromosome
+
+
 class Population:
     def __init__(self, chromosomes=None):
         """
@@ -8,14 +14,24 @@ class Population:
         """
         self.chromosomes = chromosomes or []
 
-    def initialize(self):
+    def initialize(self, size: int):
         """
         Generate random chromosomes for the population.
 
+        Args:
+        - size (int): The size of the population to generate.
+
         Modifies:
-        - self.chromosomes: List of chromosomes in the population with randomly generated values.
+        - self.chromosomes (list): List of chromosomes in the population with randomly generated values.
+
+        Returns:
+        - chromosomes (list): List of chromosomes in the population.
         """
-        pass
+        self.chromosomes = []
+        for i in range(size):
+            chromosome = Chromosome()
+            self.chromosomes.append(chromosome)
+        return self.chromosomes
 
     def select_chromosomes(self) -> list:
         """
@@ -26,17 +42,41 @@ class Population:
         """
         pass
 
-    def crossover(self, chromosomes: list) -> list:
+    def crossover(self) -> list:
         """
         Apply the crossover operator to generate offspring chromosomes.
-
-        Args:
-        - chromosomes (list): List of chromosomes to be used for crossover.
 
         Returns:
         - offspring_chromosomes (list): List of offspring chromosomes generated from crossover.
         """
-        pass
+        offspring = []
+
+        for parent1, parent2 in self.__random_pairing(self.chromosomes):
+            offspring1, offspring2 = parent1.crossover(parent2)
+            offspring.extend([offspring1, offspring])
+
+        return offspring
+
+    @staticmethod
+    def __random_pairing(chromosomes):
+        """
+        Randomly pairs up chromosomes for crossover.
+
+        Args:
+            chromosomes (list): List of chromosomes to be paired up.
+
+        Returns:
+            list: List of pairs of chromosomes for crossover.
+        """
+        chromosomes = chromosomes[:]
+        random.shuffle(chromosomes)
+
+        pairs = [(chromosomes[i], chromosomes[i + 1]) for i in range(0, len(chromosomes), 2)]
+
+        if len(chromosomes) % 2 != 0:
+            pairs[-1] = (chromosomes[-1], chromosomes[-1])
+
+        return pairs
 
     def mutate(self, mutation_rate: float) -> None:
         """

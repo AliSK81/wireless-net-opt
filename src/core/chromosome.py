@@ -1,6 +1,9 @@
 from operators.mutation.gaussian_mutation_operator import GaussianMutationOperator
 from operators.mutation.swap_mutation_operator import SwapMutationOperator
 
+from common.helper import Helper
+from operators.recombination.two_point_crossover import TwoPointsCrossoverOperator
+
 
 class Chromosome:
     def __init__(self, genes=None):
@@ -23,22 +26,28 @@ class Chromosome:
         Modifies:
         - self.allocations: The list representing the allocations of the chromosome.
         - self.locations: The list representing the locations of the chromosome.
-        - self.band_widths: The list representing the band widths of the chromosome.
+        - self.bandwidths: The list representing the band widths of the chromosome.
         """
         pass
 
-    def crossover(self, other: 'Chromosome', crossover_rate: float) -> 'Chromosome':
+    def crossover(self, other, crossover_rate):
         """
         Perform crossover with another chromosome and generate offspring chromosome.
 
         Args:
         - other (Chromosome): Another chromosome to perform crossover with.
-        - crossover_rate (float): The probability of crossover occurring.
+        - crossover_rate (float): The probability of performing crossover between the parents.
 
         Returns:
-        - offspring (Chromosome): The offspring chromosome generated from the crossover.
+        - offspring (Tuple[Chromosome, Chromosome]): A tuple containing two offspring chromosomes generated from the crossover.
         """
-        pass
+
+        offspring1_genes, offspring2_genes = TwoPointsCrossoverOperator.crossover(self.genes, other.genes, crossover_rate)
+
+        offspring1 = Chromosome(offspring1_genes)
+        offspring2 = Chromosome(offspring2_genes)
+
+        return offspring1, offspring2
 
     def mutate(self, mutation_rate: float) -> None:
         """
