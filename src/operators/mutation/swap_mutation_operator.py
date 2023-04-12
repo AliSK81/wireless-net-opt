@@ -2,13 +2,12 @@ import random
 
 
 class SwapMutationOperator:
-    def __init__(self, mutation_rate):
-        self.mutation_rate = mutation_rate
 
-    def mutate(self, genes):
+    @staticmethod
+    def mutate(genes, mutate_rate):
         mutated_genes = genes[:]
 
-        if random.random() > self.mutation_rate:
+        if random.random() > mutate_rate:
             return mutated_genes
 
         i = random.randint(0, len(mutated_genes) - 1)

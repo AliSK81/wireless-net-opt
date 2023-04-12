@@ -1,4 +1,3 @@
-import common.constants as constants
 from operators.mutation.gaussian_mutation_operator import GaussianMutationOperator
 from operators.mutation.swap_mutation_operator import SwapMutationOperator
 
@@ -18,9 +17,6 @@ class Chromosome:
         self.allocations = []
         self.locations = []
         self.band_widths = []
-
-        self.gaussian_mutation_operator = GaussianMutationOperator(mutation_rate=constants.mutate_rate, stddev=1)
-        self.swap_mutation_operator = SwapMutationOperator(mutation_rate=constants.mutate_rate)
 
     def generate_random_genes(self) -> None:
         """
@@ -46,21 +42,21 @@ class Chromosome:
         """
         pass
 
-    def mutate(self, mutation_rate: float) -> None:
+    def mutate(self, mutate_rate: float) -> None:
         """
         Mutate the allocations, locations, and band widths of the chromosome.
 
         Args:
-        - mutation_rate (float): The probability of mutation for each gene.
+        - mutate_rate (float): The probability of mutation for each gene.
 
         Modifies:
         - self.allocations: The list representing the allocations of the chromosome.
         - self.locations: The list representing the locations of the chromosome.
         - self.band_widths: The list representing the band widths of the chromosome.
         """
-        self.allocations = self.swap_mutation_operator.mutate(self.allocations)
-        self.locations = self.gaussian_mutation_operator.mutate(self.locations)
-        self.band_widths = self.gaussian_mutation_operator.mutate(self.band_widths)
+        self.allocations = SwapMutationOperator.mutate(genes=self.allocations, mutate_rate=mutate_rate)
+        self.locations = GaussianMutationOperator.mutate(genes=self.locations, mutate_rate=mutate_rate, stddev=1)
+        self.band_widths = GaussianMutationOperator.mutate(genes=self.band_widths, mutate_rate=mutate_rate, stddev=1)
 
     def calculate_fitness(self) -> float:
         """

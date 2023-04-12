@@ -2,15 +2,13 @@ import random
 
 
 class GaussianMutationOperator:
-    def __init__(self, mutation_rate, stddev):
-        self.mutation_rate = mutation_rate
-        self.stddev = stddev
 
-    def mutate(self, genes):
+    @staticmethod
+    def mutate(genes, mutate_rate, stddev):
         mutated_genes = []
         for gene in genes:
-            if random.random() < self.mutation_rate:
-                mutation = random.gauss(0, self.stddev)
+            if random.random() < mutate_rate:
+                mutation = random.gauss(0, stddev)
                 mutated_gene = gene + mutation
                 mutated_genes.append(mutated_gene)
             else:
