@@ -38,19 +38,19 @@ class Population:
         """
         pass
 
-    def mutate(self, mutate_rate: float) -> None:
+    def mutate(self, mutation_rate: float) -> None:
         """
         Apply the mutation operator to introduce small changes in the chromosomes.
 
         Args:
-        - mutate_rate (float): The mutation rate, which determines the probability of each gene in a chromosome
+        - mutation_rate (float): The mutation rate, which determines the probability of each gene in a chromosome
                               being mutated.
 
         Returns:
         - None: This method mutates the chromosomes in-place and does not return any value.
         """
         for chromosome in self.chromosomes:
-            chromosome.mutate(mutate_rate)
+            chromosome.mutate(mutation_rate)
 
     def evaluate_fitness(self, chromosomes: list):
         """
