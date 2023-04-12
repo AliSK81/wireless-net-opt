@@ -1,5 +1,4 @@
 import random
-from random import randint
 
 from core.chromosome import Chromosome
 
@@ -14,7 +13,8 @@ class Population:
         """
         self.chromosomes = chromosomes or []
 
-    def initialize(self, size: int):
+    @staticmethod
+    def initialize(chromosome_size: int, gene_size: int):
         """
         Generate random chromosomes for the population.
 
@@ -27,20 +27,43 @@ class Population:
         Returns:
         - chromosomes (list): List of chromosomes in the population.
         """
-        self.chromosomes = []
-        for i in range(size):
-            chromosome = Chromosome()
-            self.chromosomes.append(chromosome)
-        return self.chromosomes
+        population = Population()
+
+        population.chromosomes = []
+        for _ in range(chromosome_size):
+            chromosome = Chromosome.initialize(gene_size)
+            population.chromosomes.append(chromosome)
+
+        return population
+
+    def tournament_selection(self, tournament_size):
+        tournament = random.choices(self.chromosomes, k=tournament_size)
+        winner = max(tournament, key=fitness_function)
+        return winner
+
+    def fitness_proportionate_selection(self, num_parents):
+        total_fitness = sum([fitness_function(individual) for individual in self.chromosomes])
+
+        probabilities = [fitness_function(individual) / total_fitness for individual in self.chromosomes]
+
+        parents = []
+        for i in range(num_parents):
+            parent = random.choices(self.chromosomes, weights=probabilities)[0]
+            parents.append(parent)
+
+        return parents
 
     def select_chromosomes(self) -> list:
-        """
-        Select chromosomes for reproduction using tournament selection or roulette wheel selection.
+        tournament_winners = []
+        for i in range(POPULATION_SIZE // TOURNAMENT_SIZE):
+            tournament = [tournament_selection(population, TOURNAMENT_SIZE) for _ in range(TOURNAMENT_SIZE)]
+            winner = max(tournament, key=fitness_function)
+            tournament_winners.append(winner)
 
-        Returns:
-        - selected_chromosomes (list): List of selected chromosomes from the current population.
-        """
-        pass
+        # Select parents from the tournament winners using fitness proportionate selection
+        parents = fitness_proportionate_selection(tournament_winners, num_parents=50)
+
+        return parents
 
     def crossover(self) -> list:
         """
@@ -114,4 +137,9 @@ class Population:
         Modifies:
         - Updates the population with the offspring chromosomes, replacing the least fit individuals.
         """
-        pass
+        combined_chromosomes = self.chromosomes + offspring_chromosomes
+        sorted_chromosomes = sorted(combined_chromosomes, key=lambda chromosome: chromosome.fitness, reverse=True)
+        self.chromosomes = sorted_chromosomes[:len(self.chromosomes)]
+
+    def get_best_chromosome(self):
+        max(self.chromosomes, key=lambda chromosome: chromosome.fitness)

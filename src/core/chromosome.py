@@ -1,3 +1,7 @@
+import random
+from random import randint
+
+from core.gene import Gene
 from operators.mutation.gaussian_mutation_operator import GaussianMutationOperator
 from operators.mutation.swap_mutation_operator import SwapMutationOperator
 
@@ -18,6 +22,17 @@ class Chromosome:
         - band_widths (list): A list representing the bandwidths of each tower.
         """
         self.genes = genes or []
+
+    @staticmethod
+    def initialize(gene_size: int):
+        chromosome = Chromosome()
+
+        tower_sizes = randint(0, gene_size // 2)
+        towers = [Gene.initialize() for _ in range(tower_sizes)]
+
+        chromosome.genes = [random.choice(towers) for _ in range(gene_size)]
+
+        return chromosome
 
     def generate_random_genes(self) -> None:
         """

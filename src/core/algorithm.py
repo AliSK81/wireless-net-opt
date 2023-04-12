@@ -1,3 +1,8 @@
+import random
+
+from core.population import Population
+
+
 class EvolutionaryAlgorithm:
     """
     Represents an evolutionary algorithm for solving the problem of determining the optimal number of telecommunication
@@ -26,13 +31,17 @@ class EvolutionaryAlgorithm:
         Returns:
             None
         """
-        pass
+        # INITIALIZE
+        population = Population.initialize()
 
-    def get_best_solution(self):
-        """
-        Returns the best solution obtained by the algorithm.
+        for generation in range(generations):
+            # CROSSOVER
+            new_chromosomes = population.crossover()
+            new_population = Population(new_chromosomes)
+            # MUTATE
+            new_population.mutate()
+            # REPLACE
+            population.replace(offspring_chromosomes=new_population)
 
-        Returns:
-            Best solution (Solution): The best solution obtained by the algorithm.
-        """
-        pass
+        # BEST
+        return population.get_best_chromosome()
