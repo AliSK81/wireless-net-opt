@@ -1,3 +1,4 @@
+import random
 from collections import defaultdict
 
 import numpy as np
@@ -6,17 +7,18 @@ from common.config import *
 
 
 class FitnessCalculator:
+    sigma = np.array([[8, 0], [0, 8]])
+    sigma_inv = np.linalg.inv(sigma)
+
     @staticmethod
     def calc_bw_prime(tower_bandwidth, city_population, associated_cities_population):
         return city_population / associated_cities_population * tower_bandwidth
 
     @staticmethod
     def calc_coverage(tower_location, city_location):
-        sigma = np.array([[8, 0], [0, 8]])
         diff = np.array(city_location) - np.array(tower_location)
-        sigma_inv = np.linalg.inv(sigma)
-        diff_t = np.transpose(diff)
-        exp_term = -0.5 * np.matmul(diff, np.matmul(sigma_inv, diff_t))
+        diff_t = diff.T
+        exp_term = -0.5 * diff @ FitnessCalculator.sigma_inv @ diff_t
         covariance = np.exp(exp_term)
         return covariance
 
@@ -63,4 +65,4 @@ class FitnessCalculator:
             user_satisfaction_score = FitnessCalculator.calc_user_satisfaction_score(user_satisfaction_level)
             total_satisfaction += user_satisfaction_score * city_population
 
-        return total_satisfaction - total_cost
+        return 10000*total_satisfaction - 1000*total_cost

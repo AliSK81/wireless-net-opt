@@ -72,4 +72,4 @@ class Helper:
         Returns:
         - tuple: A tuple of two integers representing two random indices in the range [0, len(array)).
         """
-        return randint(0, len(array)), randint(0, len(array))
+        return Helper.sort_two_points((randint(0, len(array)), randint(0, len(array))))

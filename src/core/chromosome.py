@@ -1,8 +1,14 @@
+import random
+from random import randint
+
+from core.gene import Gene
+from operators.fitness.fitness_calculator import FitnessCalculator
 from operators.mutation.gaussian_mutation_operator import GaussianMutationOperator
 from operators.mutation.swap_mutation_operator import SwapMutationOperator
 
 from common.helper import Helper
 from operators.recombination.two_point_crossover import TwoPointsCrossoverOperator
+from common.config import *
 
 
 class Chromosome:
@@ -18,17 +24,19 @@ class Chromosome:
         - band_widths (list): A list representing the bandwidths of each tower.
         """
         self.genes = genes or []
+        self.fitness = None
 
-    def generate_random_genes(self) -> None:
-        """
-        Generate random allocations, locations, and band widths for the chromosome.
+    @staticmethod
+    def initialize():
+        chromosome = Chromosome()
 
-        Modifies:
-        - self.allocations: The list representing the allocations of the chromosome.
-        - self.locations: The list representing the locations of the chromosome.
-        - self.bandwidths: The list representing the band widths of the chromosome.
-        """
-        pass
+        tower_count = randint(TOWERS_MIN, TOWERS_MAX)
+        towers = [Gene.initialize() for _ in range(tower_count)]
+
+        chromosome.genes = [random.choice(towers) for _ in range(CITIES_COUNT)]
+        chromosome.fitness = chromosome.calculate_fitness()
+
+        return chromosome
 
     def crossover(self, other, crossover_rate):
         """
@@ -42,7 +50,8 @@ class Chromosome:
         - offspring (Tuple[Chromosome, Chromosome]): A tuple containing two offspring chromosomes generated from the crossover.
         """
 
-        offspring1_genes, offspring2_genes = TwoPointsCrossoverOperator.crossover(self.genes, other.genes, crossover_rate)
+        offspring1_genes, offspring2_genes = TwoPointsCrossoverOperator.crossover(self.genes, other.genes,
+                                                                                  crossover_rate)
 
         offspring1 = Chromosome(offspring1_genes)
         offspring2 = Chromosome(offspring2_genes)
@@ -59,7 +68,7 @@ class Chromosome:
         Returns:
         None
         """
-        self.genes = GaussianMutationOperator.mutate(genes=self.genes, mutation_rate=mutation_rate, mutation_std=1)
+        self.genes = GaussianMutationOperator.mutate(genes=self.genes, mutation_rate=mutation_rate, mutation_std=0.01)
         self.genes = SwapMutationOperator.mutate(genes=self.genes, mutation_rate=mutation_rate)
 
     def calculate_fitness(self) -> float:
@@ -69,4 +78,5 @@ class Chromosome:
         Returns:
         - float: The fitness value of the chromosome.
         """
-        pass
+        self.fitness = FitnessCalculator.calculate_fitness(self.genes)
+        return self.fitness
