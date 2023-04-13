@@ -1,6 +1,7 @@
 import random
 
 from core.chromosome import Chromosome
+from common.config import *
 
 
 class Population:
@@ -14,7 +15,7 @@ class Population:
         self.chromosomes = chromosomes or []
 
     @staticmethod
-    def initialize(chromosome_size: int, gene_size: int):
+    def initialize():
         """
         Generate random chromosomes for the population.
 
@@ -30,21 +31,16 @@ class Population:
         population = Population()
 
         population.chromosomes = []
-        for _ in range(chromosome_size):
-            chromosome = Chromosome.initialize(gene_size)
+        for _ in range(POPULATION_SIZE):
+            chromosome = Chromosome.initialize()
             population.chromosomes.append(chromosome)
 
         return population
 
-    def tournament_selection(self, tournament_size):
-        tournament = random.choices(self.chromosomes, k=tournament_size)
-        winner = max(tournament, key=fitness_function)
-        return winner
-
     def fitness_proportionate_selection(self, num_parents):
-        total_fitness = sum([fitness_function(individual) for individual in self.chromosomes])
+        total_fitness = sum([chromosome.fitness for chromosome in self.chromosomes])
 
-        probabilities = [fitness_function(individual) / total_fitness for individual in self.chromosomes]
+        probabilities = [chromosome.fitness / total_fitness for chromosome in self.chromosomes]
 
         parents = []
         for i in range(num_parents):
@@ -54,31 +50,25 @@ class Population:
         return parents
 
     def select_chromosomes(self) -> list:
-        tournament_winners = []
-        for i in range(POPULATION_SIZE // TOURNAMENT_SIZE):
-            tournament = [tournament_selection(population, TOURNAMENT_SIZE) for _ in range(TOURNAMENT_SIZE)]
-            winner = max(tournament, key=fitness_function)
-            tournament_winners.append(winner)
-
-        # Select parents from the tournament winners using fitness proportionate selection
-        parents = fitness_proportionate_selection(tournament_winners, num_parents=50)
+        parents = self.fitness_proportionate_selection(num_parents=POPULATION_SIZE)
 
         return parents
 
-    def crossover(self) -> list:
+    def crossover(self, crossover_rate):
         """
         Apply the crossover operator to generate offspring chromosomes.
 
         Returns:
         - offspring_chromosomes (list): List of offspring chromosomes generated from crossover.
         """
-        offspring = []
+
+        offspring_chromosomes = []
 
         for parent1, parent2 in self.__random_pairing(self.chromosomes):
-            offspring1, offspring2 = parent1.crossover(parent2)
-            offspring.extend([offspring1, offspring])
+            offspring1, offspring2 = parent1.crossover(parent2, crossover_rate)
+            offspring_chromosomes += [offspring1, offspring2]
 
-        return offspring
+        return Population(chromosomes=offspring_chromosomes)
 
     @staticmethod
     def __random_pairing(chromosomes):
@@ -92,7 +82,7 @@ class Population:
             list: List of pairs of chromosomes for crossover.
         """
         chromosomes = chromosomes[:]
-        random.shuffle(chromosomes)
+        # random.shuffle(chromosomes)
 
         pairs = [(chromosomes[i], chromosomes[i + 1]) for i in range(0, len(chromosomes), 2)]
 
@@ -115,7 +105,7 @@ class Population:
         for chromosome in self.chromosomes:
             chromosome.mutate(mutation_rate)
 
-    def evaluate_fitness(self, chromosomes: list):
+    def evaluate_fitness(self):
         """
         Evaluate the fitness of each chromosome in the population.
 
@@ -125,9 +115,10 @@ class Population:
         Modifies:
         - Updates the fitness values of the chromosomes in the population.
         """
-        pass
+        for chromosome in self.chromosomes:
+            chromosome.calculate_fitness()
 
-    def replace(self, offspring_chromosomes: list):
+    def replace(self, other: 'Population'):
         """
         Replace the least fit chromosomes with offspring chromosomes to create a new generation.
 
@@ -137,7 +128,7 @@ class Population:
         Modifies:
         - Updates the population with the offspring chromosomes, replacing the least fit individuals.
         """
-        combined_chromosomes = self.chromosomes + offspring_chromosomes
+        combined_chromosomes = self.chromosomes + other.chromosomes
         sorted_chromosomes = sorted(combined_chromosomes, key=lambda chromosome: chromosome.fitness, reverse=True)
         self.chromosomes = sorted_chromosomes[:len(self.chromosomes)]
 

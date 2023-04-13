@@ -21,11 +21,10 @@ class SwapMutationOperator:
         Returns:
             list: List of mutated genes after applying swap mutation.
         """
-        if random.random() > mutation_rate:
-            return genes
 
-        i = random.randint(0, len(genes) - 1)
-        j = random.randint(0, len(genes) - 1)
-        genes[i], genes[j] = genes[j], genes[i]
+        for i in range(len(genes)):
+            if random.random() < mutation_rate:
+                j = random.randint(0, len(genes) - 1)
+                genes[i], genes[j] = genes[j], genes[i]
 
         return genes

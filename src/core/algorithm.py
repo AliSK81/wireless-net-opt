@@ -1,6 +1,7 @@
-import random
+import time
 
 from core.population import Population
+from common.config import *
 
 
 class EvolutionaryAlgorithm:
@@ -10,7 +11,7 @@ class EvolutionaryAlgorithm:
     construction cost and maintenance cost based on the bandwidth.
     """
 
-    def __init__(self, blocks_population_file: str, problem_config_file: str):
+    def __init__(self):
         """
         Initializes the algorithm with input data from files.
 
@@ -20,7 +21,7 @@ class EvolutionaryAlgorithm:
         """
         pass
 
-    def evolve(self, generations: int, stopping_criterion: float):
+    def evolve(self, generations: int):
         """
         Evolves the population for a certain number of generations or until a stopping criterion is met.
 
@@ -31,17 +32,29 @@ class EvolutionaryAlgorithm:
         Returns:
             None
         """
-        # INITIALIZE
         population = Population.initialize()
+        population.evaluate_fitness()
 
         for generation in range(generations):
-            # CROSSOVER
-            new_chromosomes = population.crossover()
-            new_population = Population(new_chromosomes)
-            # MUTATE
-            new_population.mutate()
-            # REPLACE
-            population.replace(offspring_chromosomes=new_population)
+            # print("selected_chromosomes")
+            # selected_chromosomes = population.select_chromosomes()
+            # print([len(set(ch.genes)) for ch in selected_chromosomes])
+            # print()
+            new_generation = Population(population.chromosomes[:])
 
-        # BEST
+            print("crossover")
+            new_generation = new_generation.crossover(CROSSOVER_RATE)
+            print([len(set(ch.genes)) for ch in new_generation.chromosomes])
+            print()
+
+            new_generation.mutate(MUTATION_RATE)
+
+            new_generation.evaluate_fitness()
+
+            print("replace")
+            population.replace(new_generation)  # this changes the allocations
+            print([len(set(ch.genes)) for ch in population.chromosomes])
+            print()
+            print(max(population.chromosomes, key=lambda x: x.fitness).fitness)
+
         return population.get_best_chromosome()

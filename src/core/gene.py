@@ -1,4 +1,5 @@
 import random
+from common.config import *
 
 
 class Gene:
@@ -10,7 +11,7 @@ class Gene:
     def initialize():
         gene = Gene()
 
-        gene.location = (random.uniform(-10, 10), random.uniform(-10, 10))
-        gene.bandwidth = random.uniform(0, 1)
+        gene.location = (random.uniform(LOCATION_MIN_X, LOCATION_MAX_X), random.uniform(LOCATION_MIN_Y, LOCATION_MAX_Y))
+        gene.bandwidth = random.uniform(BANDWIDTH_MIN, BANDWIDTH_MAX)
 
         return gene
