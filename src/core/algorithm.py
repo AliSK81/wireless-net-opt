@@ -1,7 +1,9 @@
 import numpy as np
 
 from common.config import *
+from core.chromosome import Chromosome
 from core.population import Population
+from operators.fitness.fitness_calculator import FitnessCalculator
 
 
 class EvolutionaryAlgorithm:
@@ -13,10 +15,20 @@ class EvolutionaryAlgorithm:
 
     def __init__(self, generation_count: int):
         """
-        Initializes the algorithm with input data from files.
+        Initializes the genetic algorithm with the specified number of generations to evolve.
 
         Args:
-            generation_count (int): Number of generations to evolve.
+            generation_count (int): The number of generations to evolve.
+
+        Attributes:
+            - generation_count (int): The number of generations to evolve.
+            - generations (numpy.ndarray): An array containing the indices of each generation.
+            - sum_of_avg_fitness (numpy.ndarray): An array containing the sum of the average fitness value for each
+             generation.
+            - min_of_avg_fitness (numpy.ndarray): An array containing the minimum average fitness value for each
+             generation.
+            - max_of_avg_fitness (numpy.ndarray): An array containing the maximum average fitness value for each
+            generation.
         """
 
         self.generation_count = generation_count
@@ -28,30 +40,26 @@ class EvolutionaryAlgorithm:
     def __evolve(self):
         """
         Evolves the population for a certain number of generations or until a stopping criterion is met.
+
+        Returns:
+        - The best chromosome from the final generation.
         """
         population = Population.initialize()
         population.evaluate_fitness()
 
         for generation in range(self.generation_count):
-            # print("selected_chromosomes")
             selected_chromosomes = population.select_chromosomes()
-            # print([len(set(ch.genes)) for ch in selected_chromosomes])
-            # print()
+
             new_generation = Population(selected_chromosomes)
 
-            print("crossover")
             new_generation = new_generation.crossover(CROSSOVER_RATE)
-            print([len(set(ch.genes)) for ch in new_generation.chromosomes])
-            print()
 
             new_generation.mutate(MUTATION_RATE)
 
             new_generation.evaluate_fitness()
 
-            print("replace")
-            population.replace(new_generation)  # this changes the allocations
-            print([len(set(ch.genes)) for ch in population.chromosomes])
-            print()
+            population.replace(new_generation)
+
             max_fitness = max(population.chromosomes, key=lambda x: x.fitness).fitness
             print(max_fitness)
 
@@ -64,9 +72,49 @@ class EvolutionaryAlgorithm:
 
     def run_evolve(self, times: int = 1):
         for _ in range(times):
-            self.__evolve()
-
+            best_sol = self.__evolve()
+            Helper.write_dict_to_json(self.get_best_solution_info(best_sol))
         self.__show_plot(times)
+
+    @staticmethod
+    def get_best_solution_info(chromosome: 'Chromosome'):
+        fitness_calc = FitnessCalculator()
+        allocations = fitness_calc.group_by(chromosome.genes)
+
+        fitness = fitness_calc.calculate_fitness(chromosome.genes)
+        total_cost = fitness_calc.calc_total_cost(chromosome.genes)
+        total_satisfaction = fitness_calc.calc_total_satisfaction(chromosome.genes)
+        num_of_towers = len(set(chromosome.genes))
+
+        towers = []
+        for tower, cities in allocations.items():
+            tower_info = {
+                'loc': tower.location,
+                'bw': tower.bandwidth,
+                'cities': []
+            }
+            for city_num in cities:
+                city_location = CITIES_LOCATION[city_num]
+                city_population = CITIES_POPULATION[city_num]
+                total_population = sum([CITIES_POPULATION[c] for c in cities])
+                bandwidth = fitness_calc.calc_bandwidth(tower, city_location, city_population, total_population)
+                city_satisfaction = fitness_calc.calc_city_satisfaction_score(bandwidth, city_population)
+                city_info = {
+                    'location': city_location,
+                    'population': city_population,
+                    'bw': bandwidth,
+                    'satisfaction': city_satisfaction
+                }
+                tower_info['cities'].append({city_num: city_info})
+            towers.append(tower_info)
+
+        return {
+            'fitness': fitness,
+            'total_cost': total_cost,
+            'total_satisfaction': total_satisfaction,
+            'num_of_towers': num_of_towers,
+            'towers': towers
+        }
 
     def __show_plot(self, times):
         average_of_avg_fitness = self.sum_of_avg_fitness / times

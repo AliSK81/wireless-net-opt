@@ -13,22 +13,16 @@ class Population:
         - chromosomes (list): List of chromosomes representing the initial population.
         """
         self.chromosomes = chromosomes or []
-        self.selection_operator = FitnessProportionateOperator(self.chromosomes)
+        self.selection_operator = FitnessProportionateOperator()
         self.mu_plus_lambda_operator = MuPlusLambdaOperator()
 
     @staticmethod
     def initialize():
         """
-        Generate random chromosomes for the population.
-
-        Args:
-        - size (int): The size of the population to generate.
-
-        Modifies:
-        - self.chromosomes (list): List of chromosomes in the population with randomly generated values.
+        Static method that creates a new Population object with randomly initialized chromosomes.
 
         Returns:
-        - chromosomes (list): List of chromosomes in the population.
+            Population: A new Population object with randomly initialized chromosomes.
         """
         population = Population()
 
@@ -40,16 +34,25 @@ class Population:
         return population
 
     def select_chromosomes(self) -> list:
-        return self.selection_operator.select(POPULATION_SIZE)
+        """
+        Selects a list of chromosomes from the population using the selection operator.
+
+        Returns:
+            list: A list of selected Chromosome objects.
+        """
+        return self.selection_operator.select(self.chromosomes, POPULATION_SIZE)
 
     def crossover(self, crossover_rate):
         """
-        Apply the crossover operator to generate offspring chromosomes.
+        Performs crossover between pairs of chromosomes in the population and returns a new population with the
+         offspring.
+
+        Args:
+            crossover_rate (float): The probability that a crossover will occur between two parent chromosomes.
 
         Returns:
-        - offspring_chromosomes (list): List of offspring chromosomes generated from crossover.
+            Population: A new population object containing the offspring chromosomes created by crossover.
         """
-
         offspring_chromosomes = []
 
         for parent1, parent2 in self.__random_pairing(self.chromosomes):
@@ -70,7 +73,6 @@ class Population:
             list: List of pairs of chromosomes for crossover.
         """
         chromosomes = chromosomes[:]
-        # random.shuffle(chromosomes)
 
         pairs = [(chromosomes[i], chromosomes[i + 1]) for i in range(0, len(chromosomes), 2)]
 
@@ -97,9 +99,6 @@ class Population:
         """
         Evaluate the fitness of each chromosome in the population.
 
-        Args:
-        - chromosomes (list): List of chromosomes to be evaluated for fitness.
-
         Modifies:
         - Updates the fitness values of the chromosomes in the population.
         """
@@ -119,4 +118,10 @@ class Population:
         self.chromosomes = self.mu_plus_lambda_operator.select(self.chromosomes, other.chromosomes)
 
     def get_best_chromosome(self):
-        max(self.chromosomes, key=lambda chromosome: chromosome.fitness)
+        """
+        Returns the best chromosome in the population based on fitness.
+
+        Returns:
+            Chromosome: The chromosome in the population with the highest fitness value.
+        """
+        return max(self.chromosomes, key=lambda chromosome: chromosome.fitness)

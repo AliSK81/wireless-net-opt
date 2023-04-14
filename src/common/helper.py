@@ -1,4 +1,6 @@
 import json
+import os
+import time
 from random import randint
 
 from matplotlib import pyplot as plt
@@ -41,15 +43,6 @@ class Helper:
             config = json.load(file)
         return config
 
-    def plot_fitness_graph(self, generation_fitness_list: list):
-        """
-        Plots the graph of changes in the average fitness of the population over generations.
-
-        Args:
-            generation_fitness_list (list): List of average fitness values for each generation.
-        """
-        pass
-
     @staticmethod
     def create_two_rand_index(array):
         """
@@ -65,6 +58,21 @@ class Helper:
 
     @staticmethod
     def show_plot(x, y, y_min, y_max, x_label, y_label, title):
+        """
+        Display a plot of the given data.
+
+        Args:
+        - x (list): A list of x-coordinates for the plot.
+        - y (list): A list of y-coordinates for the plot.
+        - y_min (list): A list of minimum y-coordinates for shading the area between the minimum and maximum values.
+        - y_max (list): A list of maximum y-coordinates for shading the area between the minimum and maximum values.
+        - x_label (str): The label for the x-axis.
+        - y_label (str): The label for the y-axis.
+        - title (str): The title of the plot.
+
+        Returns:
+        None
+        """
         plt.fill_between(x, y_min, y_max, alpha=0.3)
         plt.plot(x, y)
 
@@ -73,3 +81,23 @@ class Helper:
         plt.title(title)
 
         plt.show()
+
+    @staticmethod
+    def write_dict_to_json(dictionary):
+        """
+        Write a dictionary to a JSON file with indentation for pretty formatting.
+
+        Args:
+            dictionary (dict): The dictionary to be written to JSON.
+
+        Returns:
+            None
+        """
+        current_time_millis = int(round(time.time() * 1000))
+        log_file_name = f"../resources/solutions/{current_time_millis}.json"
+
+        # Create parent directories if they do not exist
+        os.makedirs(os.path.dirname(log_file_name), exist_ok=True)
+
+        with open(log_file_name, 'w') as file:
+            json.dump(dictionary, file, indent=4)
