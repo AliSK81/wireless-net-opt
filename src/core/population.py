@@ -1,5 +1,4 @@
-import random
-
+from operators.selection.fitness_proportionate_operator import FitnessProportionateOperator
 from core.chromosome import Chromosome
 from common.config import *
 
@@ -37,22 +36,8 @@ class Population:
 
         return population
 
-    def fitness_proportionate_selection(self, num_parents):
-        total_fitness = sum([chromosome.fitness for chromosome in self.chromosomes])
-
-        probabilities = [chromosome.fitness / total_fitness for chromosome in self.chromosomes]
-
-        parents = []
-        for i in range(num_parents):
-            parent = random.choices(self.chromosomes, weights=probabilities)[0]
-            parents.append(parent)
-
-        return parents
-
     def select_chromosomes(self) -> list:
-        parents = self.fitness_proportionate_selection(num_parents=POPULATION_SIZE)
-
-        return parents
+        return FitnessProportionateOperator.selection(self, POPULATION_SIZE)
 
     def crossover(self, crossover_rate):
         """
