@@ -1,6 +1,6 @@
-from operators.selection.fitness_proportionate_operator import FitnessProportionateOperator
-from core.chromosome import Chromosome
 from common.config import *
+from core.chromosome import Chromosome
+from operators.selection.fitness_proportionate_operator import FitnessProportionateOperator
 
 
 class Population:
@@ -12,8 +12,7 @@ class Population:
         - chromosomes (list): List of chromosomes representing the initial population.
         """
         self.chromosomes = chromosomes or []
-        self.selection_operator = FitnessProportionateOperator(self.chromosomes)
-
+        self.selection_operator = FitnessProportionateOperator()
 
     @staticmethod
     def initialize():
@@ -39,7 +38,7 @@ class Population:
         return population
 
     def select_chromosomes(self) -> list:
-        return self.selection_operator.select(POPULATION_SIZE)
+        return self.selection_operator.select(self.chromosomes, POPULATION_SIZE)
 
     def crossover(self, crossover_rate):
         """
