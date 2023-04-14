@@ -1,6 +1,8 @@
 import json
 from random import randint
 
+from matplotlib import pyplot as plt
+
 
 class Helper:
     def __init__(self):
@@ -49,19 +51,6 @@ class Helper:
         pass
 
     @staticmethod
-    def sort_two_points(two_points):
-        """
-        Sort the two points in ascending order.
-
-        Args:
-        - two_points (tuple): A tuple of two integers representing the two points.
-
-        Returns:
-        - tuple: A tuple of two integers representing the sorted points in ascending order.
-        """
-        return tuple(sorted(two_points))
-
-    @staticmethod
     def create_two_rand_index(array):
         """
         Generate two random indices in the range [0, len(array)).
@@ -72,4 +61,15 @@ class Helper:
         Returns:
         - tuple: A tuple of two integers representing two random indices in the range [0, len(array)).
         """
-        return Helper.sort_two_points((randint(0, len(array)), randint(0, len(array))))
+        return randint(0, len(array)), randint(0, len(array))
+
+    @staticmethod
+    def show_plot(x, y, y_min, y_max, x_label, y_label, title):
+        plt.fill_between(x, y_min, y_max, alpha=0.3)
+        plt.plot(x, y)
+
+        plt.xlabel(x_label)
+        plt.ylabel(y_label)
+        plt.title(title)
+
+        plt.show()

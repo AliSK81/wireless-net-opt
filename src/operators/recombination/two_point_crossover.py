@@ -20,7 +20,7 @@ class TwoPointsCrossoverOperator:
         if random.random() > crossover_rate:
             return parent1[:], parent2[:]
 
-        point1, point2 = Helper.create_two_rand_index(parent1)
+        point1, point2 = tuple(sorted(Helper.create_two_rand_index(parent1)))
 
         child1 = parent1[:point1] + parent2[point1:point2] + parent1[point2:]
         child2 = parent2[:point1] + parent1[point1:point2] + parent2[point2:]
