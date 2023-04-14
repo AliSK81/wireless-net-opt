@@ -1,4 +1,5 @@
 import random
+
 from common.config import *
 
 
@@ -15,3 +16,6 @@ class Gene:
         gene.bandwidth = random.uniform(BANDWIDTH_MIN, BANDWIDTH_MAX)
 
         return gene
+
+    def copy(self):
+        return Gene(self.location, self.bandwidth)

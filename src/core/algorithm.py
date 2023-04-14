@@ -33,25 +33,18 @@ class EvolutionaryAlgorithm:
         population.evaluate_fitness()
 
         for generation in range(self.generation_count):
-            # print("selected_chromosomes")
             selected_chromosomes = population.select_chromosomes()
-            # print([len(set(ch.genes)) for ch in selected_chromosomes])
-            # print()
+
             new_generation = Population(selected_chromosomes)
 
-            print("crossover")
             new_generation = new_generation.crossover(CROSSOVER_RATE)
-            print([len(set(ch.genes)) for ch in new_generation.chromosomes])
-            print()
 
             new_generation.mutate(MUTATION_RATE)
 
             new_generation.evaluate_fitness()
 
-            print("replace")
-            population.replace(new_generation)  # this changes the allocations
-            print([len(set(ch.genes)) for ch in population.chromosomes])
-            print()
+            population.replace(new_generation)
+
             max_fitness = max(population.chromosomes, key=lambda x: x.fitness).fitness
             print(max_fitness)
 
@@ -74,3 +67,8 @@ class EvolutionaryAlgorithm:
         Helper.show_plot(x=self.generations, y=average_of_avg_fitness,
                          y_min=self.min_of_avg_fitness, y_max=self.max_of_avg_fitness,
                          x_label="generation", y_label="fitness", title="Evolutionary algorithm")
+
+    def log(self, name, chromosomes):
+        print(name + ':')
+        print([len(set(ch.genes)) for ch in chromosomes])
+        print()

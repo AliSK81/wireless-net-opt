@@ -1,13 +1,14 @@
 import random
 
+from common.config import MUTATION_RATE
+
 
 class SwapMutationOperator:
     """
     A mutation operator that performs swap mutation on a list of genes.
     """
 
-    @staticmethod
-    def mutate(genes, mutation_rate):
+    def mutate(self, genes, mutation_rate: float = MUTATION_RATE):
         """
         Performs swap mutation on a list of genes.
 

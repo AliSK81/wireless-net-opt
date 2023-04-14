@@ -6,7 +6,7 @@ from core.gene import Gene
 from operators.fitness.fitness_calculator import FitnessCalculator
 from operators.mutation.gaussian_mutation_operator import GaussianMutationOperator
 from operators.mutation.swap_mutation_operator import SwapMutationOperator
-from operators.recombination.two_point_crossover import TwoPointsCrossoverOperator
+from operators.recombination.two_point_crossover import MultiPointsCrossoverOperator
 
 
 class Chromosome:
@@ -24,7 +24,9 @@ class Chromosome:
         self.genes = genes or []
         self.fitness = None
         self.fitness_calculator = FitnessCalculator()
-        self.gaussian_mutation_operator = GaussianMutationOperator(MUTATION_RATE, 1)
+        self.swap_mutation_operator = SwapMutationOperator()
+        self.gaussian_mutation_operator = GaussianMutationOperator()
+        self.multi_point_crossover_operator = MultiPointsCrossoverOperator()
 
     @staticmethod
     def initialize():
@@ -50,8 +52,8 @@ class Chromosome:
         - offspring (Tuple[Chromosome, Chromosome]): A tuple containing two offspring chromosomes generated from the crossover.
         """
 
-        offspring1_genes, offspring2_genes = TwoPointsCrossoverOperator.crossover(self.genes, other.genes,
-                                                                                  crossover_rate)
+        offspring1_genes, offspring2_genes = self.multi_point_crossover_operator.crossover(self.genes, other.genes,
+                                                                                           crossover_rate)
 
         offspring1 = Chromosome(offspring1_genes)
         offspring2 = Chromosome(offspring2_genes)
@@ -69,7 +71,7 @@ class Chromosome:
         None
         """
         self.gaussian_mutation_operator.mutate(genes=self.genes, mutation_rate=mutation_rate)
-        SwapMutationOperator.mutate(genes=self.genes, mutation_rate=mutation_rate)
+        self.swap_mutation_operator.mutate(genes=self.genes, mutation_rate=mutation_rate)
 
     def calculate_fitness(self) -> float:
         """

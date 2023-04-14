@@ -83,4 +83,4 @@ class FitnessCalculator:
     def calculate_fitness(self, genes):
         total_cost = self.calc_total_cost(genes)
         total_satisfaction = self.calc_total_satisfaction(genes)
-        return self.total_satisfaction_ratio * total_satisfaction - self.total_cost_ratio * total_cost
+        return total_satisfaction / total_cost
