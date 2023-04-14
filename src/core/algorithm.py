@@ -2,7 +2,8 @@ import time
 
 from core.population import Population
 from common.config import *
-
+import matplotlib.pyplot as plt
+import numpy as np
 
 class EvolutionaryAlgorithm:
     """
@@ -21,26 +22,30 @@ class EvolutionaryAlgorithm:
         """
         pass
 
-    def evolve(self, generations: int):
+    def evolve(self, generation_count: int):
         """
         Evolves the population for a certain number of generations or until a stopping criterion is met.
 
         Args:
-            generations (int): Number of generations to evolve.
+            generation_count (int): Number of generations to evolve.
             stopping_criterion (float): Stopping criterion for terminating the evolution process.
 
         Returns:
             None
         """
+        generations = np.arange(generation_count)
+        generations_max_fitness = np.arange(generation_count)
+        generations_max_fitness = generations_max_fitness.astype(np.float64)
+
         population = Population.initialize()
         population.evaluate_fitness()
 
-        for generation in range(generations):
+        for generation in range(generation_count):
             # print("selected_chromosomes")
-            # selected_chromosomes = population.select_chromosomes()
+            selected_chromosomes = population.select_chromosomes()
             # print([len(set(ch.genes)) for ch in selected_chromosomes])
             # print()
-            new_generation = Population(population.chromosomes[:])
+            new_generation = Population(selected_chromosomes)
 
             print("crossover")
             new_generation = new_generation.crossover(CROSSOVER_RATE)
@@ -55,6 +60,11 @@ class EvolutionaryAlgorithm:
             population.replace(new_generation)  # this changes the allocations
             print([len(set(ch.genes)) for ch in population.chromosomes])
             print()
-            print(max(population.chromosomes, key=lambda x: x.fitness).fitness)
+            max_fitness = max(population.chromosomes, key=lambda x: x.fitness).fitness
+            print(max_fitness)
+            generations_max_fitness[generation] = max_fitness
+
+        Helper.show_plot(generations, generations_max_fitness, x_label="generation", y_label="fitness", title="Evolutionary algorithm")
 
         return population.get_best_chromosome()
+
