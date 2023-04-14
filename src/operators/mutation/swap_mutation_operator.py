@@ -26,5 +26,3 @@ class SwapMutationOperator:
             if random.random() < mutation_rate:
                 j = random.randint(0, len(genes) - 1)
                 genes[i], genes[j] = genes[j], genes[i]
-
-        return genes
