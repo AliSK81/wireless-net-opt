@@ -1,4 +1,6 @@
 import json
+import os
+import time
 from random import randint
 
 from matplotlib import pyplot as plt
@@ -73,3 +75,23 @@ class Helper:
         plt.title(title)
 
         plt.show()
+
+    @staticmethod
+    def write_dict_to_json(dictionary):
+        """
+        Write a dictionary to a JSON file with indentation for pretty formatting.
+
+        Args:
+            dictionary (dict): The dictionary to be written to JSON.
+
+        Returns:
+            None
+        """
+        current_time_millis = int(round(time.time() * 1000))
+        log_file_name = f"../resources/solutions/{current_time_millis}.json"
+
+        # Create parent directories if they do not exist
+        os.makedirs(os.path.dirname(log_file_name), exist_ok=True)
+
+        with open(log_file_name, 'w') as file:
+            json.dump(dictionary, file, indent=4)

@@ -119,4 +119,4 @@ class Population:
         self.chromosomes = sorted_chromosomes[:len(self.chromosomes)]
 
     def get_best_chromosome(self):
-        max(self.chromosomes, key=lambda chromosome: chromosome.fitness)
+        return max(self.chromosomes, key=lambda chromosome: chromosome.fitness)

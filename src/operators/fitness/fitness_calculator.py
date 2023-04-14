@@ -42,7 +42,7 @@ class FitnessCalculator:
         bw_prime = self.calc_bw_prime(tower.bandwidth, city_population, associated_cities_population)
         return coverage * bw_prime
 
-    def calc_user_satisfaction_score(self, city_bandwidth, city_population):
+    def calc_city_satisfaction_score(self, city_bandwidth, city_population):
         user_satisfaction_level = city_bandwidth / city_population
 
         if user_satisfaction_level < self.user_satisfaction_levels[0]:
@@ -50,8 +50,8 @@ class FitnessCalculator:
 
         for i in range(len(self.user_satisfaction_levels)):
             if user_satisfaction_level < self.user_satisfaction_levels[i]:
-                return self.user_satisfaction_scores[i - 1]
-        return self.user_satisfaction_scores[-1]
+                return self.user_satisfaction_scores[i - 1] * city_population
+        return self.user_satisfaction_scores[-1] * city_population
 
     @staticmethod
     def group_by(genes):
@@ -75,8 +75,8 @@ class FitnessCalculator:
             city_population = self.cities_population[city_index]
             associated_cities_population = sum([self.cities_population[i] for i in cities_by_tower[tower]])
             city_bandwidth = self.calc_bandwidth(tower, city_location, city_population, associated_cities_population)
-            user_satisfaction_score = self.calc_user_satisfaction_score(city_bandwidth, city_population)
-            total_satisfaction += user_satisfaction_score * city_population
+            city_satisfaction_score = self.calc_city_satisfaction_score(city_bandwidth, city_population)
+            total_satisfaction += city_satisfaction_score * city_population
 
         return total_satisfaction
 
