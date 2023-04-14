@@ -7,7 +7,7 @@ class MultiPointsCrossoverOperator:
 
     def crossover(self, parent1: list['Gene'], parent2: list['Gene'], crossover_rate, num_points=None):
         """
-        Performs multi-point crossover between two parent chromosomes.
+        Performs multipoint crossover between two parent chromosomes.
 
         Args:
             parent1 (list): The first parent chromosome.
@@ -24,7 +24,6 @@ class MultiPointsCrossoverOperator:
         if num_points is None:
             num_points = random.randint(1, len(parent1))
 
-        # Generate unique crossover points
         crossover_points = sorted(random.sample(range(len(parent1)), num_points))
 
         child1 = []

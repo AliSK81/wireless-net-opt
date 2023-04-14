@@ -12,14 +12,11 @@ from operators.recombination.two_point_crossover import MultiPointsCrossoverOper
 class Chromosome:
     def __init__(self, genes=None):
         """
-        Initialize an empty chromosome with allocations, locations, and band widths for each tower.
+        Initialize a new Individual object with a list of genes.
 
-        Attributes:
-        - allocations (list): A list representing the allocation of towers to the cities.
-                              The index of the list corresponds to the city number,
-                              and the value at that index corresponds to the tower number assigned to that city.
-        - locations (list): A list representing the locations of each tower.
-        - band_widths (list): A list representing the bandwidths of each tower.
+        Args:
+            genes (list): A list of genes representing the individual's genetic information. Defaults to an empty list
+            if not provided.
         """
         self.genes = genes or []
         self.fitness = None
@@ -30,6 +27,12 @@ class Chromosome:
 
     @staticmethod
     def initialize():
+        """
+       Static method that creates a new Chromosome object with randomly initialized genes.
+
+       Returns:
+           Chromosome: A new Chromosome object with randomly initialized genes.
+        """
         chromosome = Chromosome()
 
         tower_count = randint(TOWERS_MIN, TOWERS_MAX)
@@ -42,16 +45,15 @@ class Chromosome:
 
     def crossover(self, other, crossover_rate):
         """
-        Perform crossover with another chromosome and generate offspring chromosome.
+        Performs crossover between two parent chromosomes to create two offspring chromosomes.
 
         Args:
-        - other (Chromosome): Another chromosome to perform crossover with.
-        - crossover_rate (float): The probability of performing crossover between the parents.
+            other (Chromosome): The other parent chromosome to cross with.
+            crossover_rate (float): The probability of performing crossover.
 
         Returns:
-        - offspring (Tuple[Chromosome, Chromosome]): A tuple containing two offspring chromosomes generated from the crossover.
+            tuple: A tuple containing two new offspring Chromosome objects.
         """
-
         offspring1_genes, offspring2_genes = self.multi_point_crossover_operator.crossover(self.genes, other.genes,
                                                                                            crossover_rate)
 
@@ -82,3 +84,7 @@ class Chromosome:
         """
         self.fitness = self.fitness_calculator.calculate_fitness(self.genes)
         return self.fitness
+
+    def __str__(self):
+        genes_str = ", \n".join(str(gene) for gene in self.genes)
+        return f"Chromosome: genes=[\n{genes_str}\n],\nfitness={self.fitness}"

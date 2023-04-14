@@ -7,7 +7,6 @@ class GaussianMutationOperator:
     """
     A mutation operator that applies Gaussian mutation to a list of genes.
     """
-
     def __init__(self,
                  location_min_x: float = LOCATION_MIN_X,
                  location_min_y: float = LOCATION_MIN_Y,
@@ -49,7 +48,6 @@ class GaussianMutationOperator:
         Returns:
             list: List of mutated genes after applying Gaussian mutation.
         """
-
         for gene in genes:
             if random.random() < mutation_rate:
                 location_mutation = random.gauss(0, location_mutation_std)

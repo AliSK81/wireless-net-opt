@@ -15,10 +15,20 @@ class EvolutionaryAlgorithm:
 
     def __init__(self, generation_count: int):
         """
-        Initializes the algorithm with input data from files.
+        Initializes the genetic algorithm with the specified number of generations to evolve.
 
         Args:
-            generation_count (int): Number of generations to evolve.
+            generation_count (int): The number of generations to evolve.
+
+        Attributes:
+            - generation_count (int): The number of generations to evolve.
+            - generations (numpy.ndarray): An array containing the indices of each generation.
+            - sum_of_avg_fitness (numpy.ndarray): An array containing the sum of the average fitness value for each
+             generation.
+            - min_of_avg_fitness (numpy.ndarray): An array containing the minimum average fitness value for each
+             generation.
+            - max_of_avg_fitness (numpy.ndarray): An array containing the maximum average fitness value for each
+            generation.
         """
 
         self.generation_count = generation_count
@@ -30,6 +40,9 @@ class EvolutionaryAlgorithm:
     def __evolve(self):
         """
         Evolves the population for a certain number of generations or until a stopping criterion is met.
+
+        Returns:
+        - The best chromosome from the final generation.
         """
         population = Population.initialize()
         population.evaluate_fitness()

@@ -7,6 +7,16 @@ class FitnessProportionateOperator:
         pass
 
     def select(self, chromosomes, num_parents):
+        """
+        Selects parents from a list of chromosomes based on their fitness using the fitness proportionate selection algorithm.
+
+        Args:
+            chromosomes (list): List of Chromosome objects to select parents from.
+            num_parents (int): The number of parents to select.
+
+        Returns:
+            list: List of selected parents.
+        """
         total_fitness = sum([chromosome.fitness for chromosome in chromosomes])
 
         probabilities = [chromosome.fitness / total_fitness for chromosome in chromosomes]
