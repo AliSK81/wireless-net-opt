@@ -12,6 +12,8 @@ class Population:
         - chromosomes (list): List of chromosomes representing the initial population.
         """
         self.chromosomes = chromosomes or []
+        self.selection_operator = FitnessProportionateOperator(self.chromosomes)
+
 
     @staticmethod
     def initialize():
@@ -37,7 +39,7 @@ class Population:
         return population
 
     def select_chromosomes(self) -> list:
-        return FitnessProportionateOperator.selection(self, POPULATION_SIZE)
+        return self.selection_operator.select(POPULATION_SIZE)
 
     def crossover(self, crossover_rate):
         """
