@@ -24,6 +24,7 @@ class Chromosome:
         self.genes = genes or []
         self.fitness = None
         self.fitness_calculator = FitnessCalculator()
+        self.gaussian_mutation_operator = GaussianMutationOperator(MUTATION_RATE, 1)
 
     @staticmethod
     def initialize():
@@ -67,8 +68,8 @@ class Chromosome:
         Returns:
         None
         """
-        self.genes = GaussianMutationOperator.mutate(genes=self.genes, mutation_rate=mutation_rate, mutation_std=0.01)
-        self.genes = SwapMutationOperator.mutate(genes=self.genes, mutation_rate=mutation_rate)
+        self.gaussian_mutation_operator.mutate(genes=self.genes, mutation_rate=mutation_rate)
+        SwapMutationOperator.mutate(genes=self.genes, mutation_rate=mutation_rate)
 
     def calculate_fitness(self) -> float:
         """
