@@ -37,6 +37,15 @@ class EvolutionaryAlgorithm:
         self.min_of_avg_fitness = np.full(generation_count, np.finfo(np.float64).max)
         self.max_of_avg_fitness = np.full(generation_count, np.finfo(np.float64).min)
 
+    def run_evolve(self, times: int = 1):
+        for _ in range(times):
+            best_sol = self.__evolve()
+            Helper.write_dict_to_json(self.__get_best_solution_info(best_sol))
+
+        Helper.show_plot(x=self.generations, y=self.__get_average_of_avg_fitness(times),
+                         y_min=self.min_of_avg_fitness, y_max=self.max_of_avg_fitness,
+                         x_label="generation", y_label="fitness", title="Evolutionary algorithm")
+
     def __evolve(self):
         """
         Evolves the population for a certain number of generations or until a stopping criterion is met.
@@ -60,24 +69,24 @@ class EvolutionaryAlgorithm:
 
             population.replace(new_generation)
 
-            max_fitness = max(population.chromosomes, key=lambda x: x.fitness).fitness
-            print(max_fitness)
+            self.__print_max_fitness(population)
 
-            average = sum([chromosome.fitness for chromosome in population.chromosomes]) / len(population.chromosomes)
-            self.sum_of_avg_fitness[generation] += average
-            self.max_of_avg_fitness[generation] = max(average, self.max_of_avg_fitness[generation])
-            self.min_of_avg_fitness[generation] = min(average, self.min_of_avg_fitness[generation])
+            self.__update_avg_fitness(generation, population)
 
         return population.get_best_chromosome()
 
-    def run_evolve(self, times: int = 1):
-        for _ in range(times):
-            best_sol = self.__evolve()
-            Helper.write_dict_to_json(self.get_best_solution_info(best_sol))
-        self.__show_plot(times)
+    def __print_max_fitness(self, population):
+        max_fitness = max(population.chromosomes, key=lambda x: x.fitness).fitness
+        print(max_fitness)
+
+    def __update_avg_fitness(self, generation, population):
+        average = sum([chromosome.fitness for chromosome in population.chromosomes]) / len(population.chromosomes)
+        self.sum_of_avg_fitness[generation] += average
+        self.max_of_avg_fitness[generation] = max(average, self.max_of_avg_fitness[generation])
+        self.min_of_avg_fitness[generation] = min(average, self.min_of_avg_fitness[generation])
 
     @staticmethod
-    def get_best_solution_info(chromosome: 'Chromosome'):
+    def __get_best_solution_info(chromosome: 'Chromosome'):
         fitness_calc = FitnessCalculator()
         allocations = fitness_calc.group_by(chromosome.genes)
 
@@ -116,9 +125,5 @@ class EvolutionaryAlgorithm:
             'towers': towers
         }
 
-    def __show_plot(self, times):
-        average_of_avg_fitness = self.sum_of_avg_fitness / times
-
-        Helper.show_plot(x=self.generations, y=average_of_avg_fitness,
-                         y_min=self.min_of_avg_fitness, y_max=self.max_of_avg_fitness,
-                         x_label="generation", y_label="fitness", title="Evolutionary algorithm")
+    def __get_average_of_avg_fitness(self, times):
+        return self.sum_of_avg_fitness / times
