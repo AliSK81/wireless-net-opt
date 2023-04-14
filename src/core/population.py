@@ -1,18 +1,20 @@
-from common.config import *
-from core.chromosome import Chromosome
 from operators.selection.fitness_proportionate_operator import FitnessProportionateOperator
+from operators.selection.mu_plus_lambda_operator import MuPlusLambdaOperator
+from core.chromosome import Chromosome
+from common.config import *
 
 
 class Population:
     def __init__(self, chromosomes=None):
         """
-        Initializes a new Population object with the given list of chromosomes.
+        Initialize a population with a given list of chromosomes.
 
         Args:
-            chromosomes (list, optional): A list of Chromosome objects. Defaults to None.
+        - chromosomes (list): List of chromosomes representing the initial population.
         """
         self.chromosomes = chromosomes or []
         self.selection_operator = FitnessProportionateOperator()
+        self.mu_plus_lambda_operator = MuPlusLambdaOperator()
 
     @staticmethod
     def initialize():
@@ -113,9 +115,7 @@ class Population:
         Modifies:
         - Updates the population with the offspring chromosomes, replacing the least fit individuals.
         """
-        combined_chromosomes = self.chromosomes + other.chromosomes
-        sorted_chromosomes = sorted(combined_chromosomes, key=lambda chromosome: chromosome.fitness, reverse=True)
-        self.chromosomes = sorted_chromosomes[:len(self.chromosomes)]
+        self.chromosomes = self.mu_plus_lambda_operator.select(self.chromosomes, other.chromosomes)
 
     def get_best_chromosome(self):
         """
