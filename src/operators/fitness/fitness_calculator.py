@@ -1,4 +1,3 @@
-import random
 from collections import defaultdict
 
 import numpy as np
@@ -7,62 +6,70 @@ from common.config import *
 
 
 class FitnessCalculator:
-    sigma = np.array([[8, 0], [0, 8]])
-    sigma_inv = np.linalg.inv(sigma)
+    def __init__(self, tower_construction_cost=TOWER_CONSTRUCTION_COST,
+                 tower_maintenance_cost=TOWER_MAINTENANCE_COST,
+                 user_satisfaction_levels=USER_SATISFACTION_LEVELS,
+                 user_satisfaction_scores=USER_SATISFACTIONS_SCORES,
+                 cities_location=CITIES_LOCATION,
+                 cities_population=CITIES_POPULATION,
+                 total_satisfaction_ratio=TOTAL_SATISFACTION_RATIO,
+                 total_cost_ratio=TOTAL_COST_RATIO):
 
-    @staticmethod
-    def calc_bw_prime(tower_bandwidth, city_population, associated_cities_population):
+        self.sigma = np.array([[8, 0], [0, 8]])
+        self.sigma_inv = np.linalg.inv(self.sigma)
+        self.tower_construction_cost = tower_construction_cost
+        self.tower_maintenance_cost = tower_maintenance_cost
+        self.user_satisfaction_levels = user_satisfaction_levels
+        self.user_satisfaction_scores = user_satisfaction_scores
+        self.cities_location = cities_location
+        self.cities_population = cities_population
+        self.total_satisfaction_ratio = total_satisfaction_ratio
+        self.total_cost_ratio = total_cost_ratio
+
+    def calc_bw_prime(self, tower_bandwidth, city_population, associated_cities_population):
         return city_population / associated_cities_population * tower_bandwidth
 
-    @staticmethod
-    def calc_coverage(tower_location, city_location):
+    def calc_coverage(self, tower_location, city_location):
         diff = np.array(city_location) - np.array(tower_location)
         diff_t = diff.T
-        exp_term = -0.5 * diff @ FitnessCalculator.sigma_inv @ diff_t
+        exp_term = -0.5 * diff @ self.sigma_inv @ diff_t
         covariance = np.exp(exp_term)
         return covariance
 
-    @staticmethod
-    def calc_bandwidth(tower, city_location, city_population, associated_cities_population):
-        coverage = FitnessCalculator.calc_coverage(tower.location, city_location)
-        bw_prime = FitnessCalculator.calc_bw_prime(tower.bandwidth, city_population, associated_cities_population)
+    def calc_bandwidth(self, tower, city_location, city_population, associated_cities_population):
+        coverage = self.calc_coverage(tower.location, city_location)
+        bw_prime = self.calc_bw_prime(tower.bandwidth, city_population, associated_cities_population)
         return coverage * bw_prime
 
-    @staticmethod
-    def calc_user_satisfaction_level(city_bandwidth, city_population):
+    def calc_user_satisfaction_level(self, city_bandwidth, city_population):
         return city_bandwidth / city_population
 
-    @staticmethod
-    def calc_user_satisfaction_score(user_satisfaction_level):
-        for i in range(len(USER_SATISFACTION_LEVELS)):
-            if user_satisfaction_level < USER_SATISFACTION_LEVELS[i]:
-                return USER_SATISFACTIONS_SCORES[i]
-        return USER_SATISFACTIONS_SCORES[-1]
+    def calc_user_satisfaction_score(self, user_satisfaction_level):
+        for i in range(len(self.user_satisfaction_levels)):
+            if user_satisfaction_level < self.user_satisfaction_levels[i]:
+                return self.user_satisfaction_scores[i]
+        return self.user_satisfaction_scores[-1]
 
-    @staticmethod
-    def group_by(genes):
+    def group_by(self, genes):
         groups = defaultdict(list)
-
         for city_index, tower in enumerate(genes):
             groups[tower].append(city_index)
-
         return groups
 
-    @staticmethod
-    def calculate_fitness(genes):
-        cities_by_tower = FitnessCalculator.group_by(genes)
+    def calculate_fitness(self, genes):
+        cities_by_tower = self.group_by(genes)
 
-        total_cost = sum([TOWER_CONSTRUCTION_COST + TOWER_MAINTENANCE_COST * tower.bandwidth for tower in set(genes)])
+        total_cost = sum(
+            [self.tower_construction_cost + self.tower_maintenance_cost * tower.bandwidth for tower in set(genes)])
         total_satisfaction = 0.0
 
         for city_index, tower in enumerate(genes):
-            city_location = CITIES_LOCATION[city_index]
-            city_population = CITIES_POPULATION[city_index]
-            associated_cities_population = sum([CITIES_POPULATION[i] for i in cities_by_tower[tower]])
-            city_bandwidth = FitnessCalculator.calc_bandwidth(tower, city_location, city_population,
-                                                              associated_cities_population)
-            user_satisfaction_level = FitnessCalculator.calc_user_satisfaction_level(city_bandwidth, city_population)
-            user_satisfaction_score = FitnessCalculator.calc_user_satisfaction_score(user_satisfaction_level)
+            city_location = self.cities_location[city_index]
+            city_population = self.cities_population[city_index]
+            associated_cities_population = sum([self.cities_population[i] for i in cities_by_tower[tower]])
+            city_bandwidth = self.calc_bandwidth(tower, city_location, city_population, associated_cities_population)
+            user_satisfaction_level = self.calc_user_satisfaction_level(city_bandwidth, city_population)
+            user_satisfaction_score = self.calc_user_satisfaction_score(user_satisfaction_level)
             total_satisfaction += user_satisfaction_score * city_population
 
-        return 10000*total_satisfaction - 1000*total_cost
+        return self.total_satisfaction_ratio * total_satisfaction - self.total_cost_ratio * total_cost
