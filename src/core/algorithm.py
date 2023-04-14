@@ -1,7 +1,9 @@
 import numpy as np
 
 from common.config import *
+from core.chromosome import Chromosome
 from core.population import Population
+from operators.fitness.fitness_calculator import FitnessCalculator
 
 
 class EvolutionaryAlgorithm:
@@ -57,9 +59,49 @@ class EvolutionaryAlgorithm:
 
     def run_evolve(self, times: int = 1):
         for _ in range(times):
-            self.__evolve()
-
+            best_sol = self.__evolve()
+            Helper.write_dict_to_json(self.get_best_solution_info(best_sol))
         self.__show_plot(times)
+
+    @staticmethod
+    def get_best_solution_info(chromosome: 'Chromosome'):
+        fitness_calc = FitnessCalculator()
+        allocations = fitness_calc.group_by(chromosome.genes)
+
+        fitness = fitness_calc.calculate_fitness(chromosome.genes)
+        total_cost = fitness_calc.calc_total_cost(chromosome.genes)
+        total_satisfaction = fitness_calc.calc_total_satisfaction(chromosome.genes)
+        num_of_towers = len(set(chromosome.genes))
+
+        towers = []
+        for tower, cities in allocations.items():
+            tower_info = {
+                'loc': tower.location,
+                'bw': tower.bandwidth,
+                'cities': []
+            }
+            for city_num in cities:
+                city_location = CITIES_LOCATION[city_num]
+                city_population = CITIES_POPULATION[city_num]
+                total_population = sum([CITIES_POPULATION[c] for c in cities])
+                bandwidth = fitness_calc.calc_bandwidth(tower, city_location, city_population, total_population)
+                city_satisfaction = fitness_calc.calc_city_satisfaction_score(bandwidth, city_population)
+                city_info = {
+                    'location': city_location,
+                    'population': city_population,
+                    'bw': bandwidth,
+                    'satisfaction': city_satisfaction
+                }
+                tower_info['cities'].append({city_num: city_info})
+            towers.append(tower_info)
+
+        return {
+            'fitness': fitness,
+            'total_cost': total_cost,
+            'total_satisfaction': total_satisfaction,
+            'num_of_towers': num_of_towers,
+            'towers': towers
+        }
 
     def __show_plot(self, times):
         average_of_avg_fitness = self.sum_of_avg_fitness / times
@@ -67,8 +109,3 @@ class EvolutionaryAlgorithm:
         Helper.show_plot(x=self.generations, y=average_of_avg_fitness,
                          y_min=self.min_of_avg_fitness, y_max=self.max_of_avg_fitness,
                          x_label="generation", y_label="fitness", title="Evolutionary algorithm")
-
-    def log(self, name, chromosomes):
-        print(name + ':')
-        print([len(set(ch.genes)) for ch in chromosomes])
-        print()
