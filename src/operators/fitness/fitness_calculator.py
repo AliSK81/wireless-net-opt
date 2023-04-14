@@ -6,12 +6,6 @@ from common.config import *
 
 
 class FitnessCalculator:
-    """
-    Calculates the fitness of a set of genes, which represent a solution to the problem of optimizing the
-    placement of wireless towers in a set of cities, taking into account the trade-off between the cost of the
-    infrastructure and the satisfaction of the users.
-    """
-
     def __init__(self, tower_construction_cost=TOWER_CONSTRUCTION_COST,
                  tower_maintenance_cost=TOWER_MAINTENANCE_COST,
                  user_satisfaction_levels=USER_SATISFACTION_LEVELS,
@@ -101,17 +95,7 @@ class FitnessCalculator:
         bw_prime = self.calc_bw_prime(tower.bandwidth, city_population, associated_cities_population)
         return coverage * bw_prime
 
-    def calc_user_satisfaction_score(self, city_bandwidth, city_population):
-        """
-        Calculates the user satisfaction score for a city based on its bandwidth and population.
-
-        Parameters:
-            city_bandwidth (float): The bandwidth of the tower associated with the city.
-            city_population (int): The population of the city.
-
-        Returns:
-            float: The user satisfaction score for the city.
-        """
+    def calc_city_satisfaction_score(self, city_bandwidth, city_population):
         user_satisfaction_level = city_bandwidth / city_population
 
         if user_satisfaction_level < self.user_satisfaction_levels[0]:
@@ -119,8 +103,8 @@ class FitnessCalculator:
 
         for i in range(len(self.user_satisfaction_levels)):
             if user_satisfaction_level < self.user_satisfaction_levels[i]:
-                return self.user_satisfaction_scores[i - 1]
-        return self.user_satisfaction_scores[-1]
+                return self.user_satisfaction_scores[i - 1] * city_population
+        return self.user_satisfaction_scores[-1] * city_population
 
     @staticmethod
     def group_by(genes):
@@ -174,8 +158,8 @@ class FitnessCalculator:
             city_population = self.cities_population[city_index]
             associated_cities_population = sum([self.cities_population[i] for i in cities_by_tower[tower]])
             city_bandwidth = self.calc_bandwidth(tower, city_location, city_population, associated_cities_population)
-            user_satisfaction_score = self.calc_user_satisfaction_score(city_bandwidth, city_population)
-            total_satisfaction += user_satisfaction_score * city_population
+            city_satisfaction_score = self.calc_city_satisfaction_score(city_bandwidth, city_population)
+            total_satisfaction += city_satisfaction_score * city_population
 
         return total_satisfaction
 
