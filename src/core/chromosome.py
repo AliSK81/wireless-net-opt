@@ -1,14 +1,12 @@
 import random
 from random import randint
 
+from common.config import *
 from core.gene import Gene
 from operators.fitness.fitness_calculator import FitnessCalculator
 from operators.mutation.gaussian_mutation_operator import GaussianMutationOperator
 from operators.mutation.swap_mutation_operator import SwapMutationOperator
-
-from common.helper import Helper
 from operators.recombination.two_point_crossover import TwoPointsCrossoverOperator
-from common.config import *
 
 
 class Chromosome:
@@ -25,6 +23,7 @@ class Chromosome:
         """
         self.genes = genes or []
         self.fitness = None
+        self.fitness_calculator = FitnessCalculator()
 
     @staticmethod
     def initialize():
@@ -78,5 +77,5 @@ class Chromosome:
         Returns:
         - float: The fitness value of the chromosome.
         """
-        self.fitness = FitnessCalculator.calculate_fitness(self.genes)
+        self.fitness = self.fitness_calculator.calculate_fitness(self.genes)
         return self.fitness
