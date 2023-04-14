@@ -1,9 +1,8 @@
-import time
-
-from core.population import Population
-from common.config import *
-import matplotlib.pyplot as plt
 import numpy as np
+
+from common.config import *
+from core.population import Population
+
 
 class EvolutionaryAlgorithm:
     """
@@ -12,35 +11,28 @@ class EvolutionaryAlgorithm:
     construction cost and maintenance cost based on the bandwidth.
     """
 
-    def __init__(self):
+    def __init__(self, generation_count: int):
         """
         Initializes the algorithm with input data from files.
 
         Args:
-            blocks_population_file (str): File containing the blocks population data.
-            problem_config_file (str): File containing the problem configuration data.
+            generation_count (int): Number of generations to evolve.
         """
-        pass
 
-    def evolve(self, generation_count: int):
+        self.generation_count = generation_count
+        self.generations = np.arange(self.generation_count)
+        self.sum_of_avg_fitness = np.zeros(generation_count, dtype=np.float64)
+        self.min_of_avg_fitness = np.full(generation_count, np.finfo(np.float64).max)
+        self.max_of_avg_fitness = np.full(generation_count, np.finfo(np.float64).min)
+
+    def __evolve(self):
         """
         Evolves the population for a certain number of generations or until a stopping criterion is met.
-
-        Args:
-            generation_count (int): Number of generations to evolve.
-            stopping_criterion (float): Stopping criterion for terminating the evolution process.
-
-        Returns:
-            None
         """
-        generations = np.arange(generation_count)
-        generations_max_fitness = np.arange(generation_count)
-        generations_max_fitness = generations_max_fitness.astype(np.float64)
-
         population = Population.initialize()
         population.evaluate_fitness()
 
-        for generation in range(generation_count):
+        for generation in range(self.generation_count):
             # print("selected_chromosomes")
             selected_chromosomes = population.select_chromosomes()
             # print([len(set(ch.genes)) for ch in selected_chromosomes])
@@ -62,9 +54,23 @@ class EvolutionaryAlgorithm:
             print()
             max_fitness = max(population.chromosomes, key=lambda x: x.fitness).fitness
             print(max_fitness)
-            generations_max_fitness[generation] = max_fitness
 
-        Helper.show_plot(generations, generations_max_fitness, x_label="generation", y_label="fitness", title="Evolutionary algorithm")
+            average = sum([chromosome.fitness for chromosome in population.chromosomes]) / len(population.chromosomes)
+            self.sum_of_avg_fitness[generation] += average
+            self.max_of_avg_fitness[generation] = max(average, self.max_of_avg_fitness[generation])
+            self.min_of_avg_fitness[generation] = min(average, self.min_of_avg_fitness[generation])
 
         return population.get_best_chromosome()
 
+    def run_evolve(self, times: int = 1):
+        for _ in range(times):
+            self.__evolve()
+
+        self.__show_plot(times)
+
+    def __show_plot(self, times):
+        average_of_avg_fitness = self.sum_of_avg_fitness / times
+
+        Helper.show_plot(x=self.generations, y=average_of_avg_fitness,
+                         y_min=self.min_of_avg_fitness, y_max=self.max_of_avg_fitness,
+                         x_label="generation", y_label="fitness", title="Evolutionary algorithm")

@@ -64,8 +64,9 @@ class Helper:
         return randint(0, len(array)), randint(0, len(array))
 
     @staticmethod
-    def show_plot(x_values, y_values, x_label, y_label, title):
-        plt.plot(x_values, y_values)
+    def show_plot(x, y, y_min, y_max, x_label, y_label, title):
+        plt.fill_between(x, y_min, y_max, alpha=0.3)
+        plt.plot(x, y)
 
         plt.xlabel(x_label)
         plt.ylabel(y_label)
